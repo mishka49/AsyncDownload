@@ -15,10 +15,6 @@ class TestDownload:
     paths = ["file1.txt", "file2.txt, file3.txt, file4.txt"]
     local_dir = tempfile.mkdtemp(dir="./")
 
-    @pytest.fixture(autouse=True)
-    def delete_temp_dir(self):
-        pass
-
     def test_request_response(self):
         response = requests.get(self.base_url)
 
@@ -48,3 +44,11 @@ class TestDownload:
         instance.run()
 
         assert TestDownload.paths == get_list_of_files()
+
+
+@pytest.fixture(scope='class', autouse=True)
+def cleanup_after_class(request):
+    def teardown():
+        os.rmdir(f"./{TestDownload.local_dir}")
+
+    request.addfinalizer(teardown)
