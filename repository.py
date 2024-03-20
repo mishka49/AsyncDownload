@@ -1,3 +1,5 @@
+
+
 import os
 import shutil
 import tempfile
@@ -55,6 +57,3 @@ class Repository:
         self.HEAD_commit_hash = self.__get_head_commit_hash()
         self.HEAD_commit_tree = self.__get_head_commit_tree()
         self.HEAD_commit_files_paths = self.__get_head_commit_files_paths()
-
-    # def __del__(self):
-    #     shutil.rmtree(self.directory)
