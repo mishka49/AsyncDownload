@@ -5,7 +5,7 @@ import tempfile
 
 import pytest
 
-from download import Download
+from download import Downloader
 
 import requests
 
@@ -23,7 +23,7 @@ class TestDownload:
     @pytest.mark.asyncio(scope="module")
     async def test_number_of_stream(self, mocker):
         mocker.patch('download.Download.download_file', return_value=None)
-        instance = Download(TestDownload.paths, TestDownload.base_url, TestDownload.local_dir)
+        instance = Downloader(TestDownload.paths, TestDownload.base_url, TestDownload.local_dir)
 
         tasks = await instance.run()
 
@@ -40,7 +40,7 @@ class TestDownload:
 
         mocker.patch('download.Download.download_file', side_effect=create_files(), return_value=None)
 
-        instance = Download(copy.deepcopy(TestDownload.paths), TestDownload.base_url, TestDownload.local_dir)
+        instance = Downloader(copy.deepcopy(TestDownload.paths), TestDownload.base_url, TestDownload.local_dir)
         instance.run()
 
         assert TestDownload.paths == get_list_of_files()
