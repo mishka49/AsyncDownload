@@ -1,6 +1,5 @@
 """Modul for getting list of files from remote repository."""
 
-
 import os
 import shutil
 import tempfile
@@ -45,6 +44,7 @@ class Repository(object):
         for ref in git_instance.ls_remote(self.remote_repo_url).split('\n'):
             hash_ref_list = ref.split('\t')
             remote_refs[hash_ref_list[1]] = hash_ref_list[0]
+
         return remote_refs.get('HEAD', '')
 
     def _get_head_commit_tree(self):
@@ -62,6 +62,7 @@ class Repository(object):
 
         repo = git.Repo(self.directory)
         commit = repo.commit(self.HEAD_commit_hash)
+
         return commit.tree
 
     def _clean_folder_except_specific(self, directory, exceptions):
@@ -80,21 +81,11 @@ class Repository(object):
                 else:
                     os.remove(item_path)
 
-
-    def __get_head_commit_files_paths(self):
-        return [item.path for item in self.HEAD_commit_tree.traverse()]
-
-    def update(self):
-        self.HEAD_commit_hash = self.__get_head_commit_hash()
-        self.HEAD_commit_tree = self.__get_head_commit_tree()
-        self.HEAD_commit_files_paths = self.__get_head_commit_files_paths()
-
     def _get_head_commit_files_paths(self):
         """
         Retrieve a list of file paths from the HEAD commit tree.
 
         Returns:
-            list: List of file paths.
+             list: List of file paths.
         """
         return [_.path for _ in self.HEAD_commit_tree.traverse()]
-
