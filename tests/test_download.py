@@ -1,5 +1,8 @@
 """Module to testing Downloader class"""
 
+import sys
+sys.path.append('C:/Different/Python/AsyncDownload/')
+
 import copy
 import os
 import tempfile

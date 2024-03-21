@@ -1,5 +1,8 @@
 """Module for testing the calculator_sha256 module."""
 
+import sys
+sys.path.append('C:/Different/Python/AsyncDownload/')
+
 import hashlib
 from pathlib import Path
 
