@@ -1,6 +1,8 @@
 """Module to testing Downloader class"""
-
+import asyncio
+import shutil
 import sys
+
 sys.path.append('C:/Different/Python/AsyncDownload/')
 
 import copy
@@ -23,6 +25,18 @@ class TestDownloader:
         response = requests.get(self.base_url)
 
         assert response.ok
+
+    def test_downloader_initialization(self):
+        """Test if the repository initialized success"""
+        repo_url = 'https://gitea.radium.group/radium/project-configuration'  # replace with a real repository URL
+        downloader = Downloader(TestDownloader.paths,
+                                TestDownloader.base_url,
+                                TestDownloader.local_dir,
+                                )
+
+        assert downloader.paths == TestDownloader.paths
+        assert downloader.base_url == TestDownloader.base_url
+        assert downloader.local_dir == TestDownloader.local_dir
 
     @pytest.mark.asyncio(scope="module")
     async def test_number_of_stream(self, mocker):
@@ -80,6 +94,56 @@ class TestDownloader:
 
         assert TestDownloader.paths == get_list_of_files()
 
+    @pytest.fixture(scope="module")
+    def download_file(self):
+        """
+        A pytest fixture that sets up a file for testing.
+
+        This fixture creates an instance of the Downloader class and uses it to download a file.
+        The file is downloaded using the asyncio event loop to handle the asynchronous operation.
+
+        Returns:
+            str: The path to the downloaded file.
+        """
+        file_name = 'README.md'
+        file_path = os.path.join(TestDownloader.local_dir, file_name)
+
+        instance = Downloader(
+            copy.deepcopy(TestDownloader.paths),
+            TestDownloader.base_url,
+            TestDownloader.local_dir,
+        )
+
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(instance.download_file(file_name))
+        loop.run_until_complete(task)
+
+        return file_path
+
+    @pytest.mark.asyncio
+    async def test_file_exists(self, download_file):
+        """
+        An asynchronous test that checks if a file exists at the specified path.
+
+        This test uses the download_file fixture to get the path to a file, and then checks if a file exists at that path.
+
+        Args:
+            download_file (str): The path to the file to check.
+        """
+        assert os.path.exists(download_file)
+
+    @pytest.mark.asyncio
+    async def test_file_isfile(self, download_file):
+        """
+        An asynchronous test that checks if the path points to a file.
+
+        This test uses the download_file fixture to get the path to a file, and then checks if the path points to a file (and not a directory).
+
+        Args:
+            download_file (str): The path to the file to check.
+        """
+        assert os.path.isfile(download_file)
+
 
 @pytest.fixture(scope='class', autouse=True)
 def cleanup_after_class(request):
@@ -94,6 +158,6 @@ def cleanup_after_class(request):
     """
 
     def teardown():
-        os.rmdir(f"./{TestDownloader.local_dir}")
+        shutil.rmtree(f"./{TestDownloader.local_dir}")
 
     request.addfinalizer(teardown)

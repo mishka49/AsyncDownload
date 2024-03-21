@@ -89,3 +89,4 @@ class Repository(object):
              list: List of file paths.
         """
         return [_.path for _ in self.HEAD_commit_tree.traverse()]
+
