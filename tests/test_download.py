@@ -28,7 +28,7 @@ class TestDownloader:
 
     def test_downloader_initialization(self):
         """Test if the repository initialized success"""
-        repo_url = 'https://gitea.radium.group/radium/project-configuration'  # replace with a real repository URL
+        repo_url = 'https://gitea.radium.group/radium/project-configuration'
         downloader = Downloader(TestDownloader.paths,
                                 TestDownloader.base_url,
                                 TestDownloader.local_dir,

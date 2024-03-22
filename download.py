@@ -1,6 +1,5 @@
 """Module for downloading files from remote repository."""
 
-
 import asyncio
 from urllib.parse import quote
 
@@ -19,7 +18,9 @@ class Downloader(object):
             base_url (str): Path to the remote source.
             local_dir (str): Path to the local directory.
         """
-        self.paths = paths
+        self.paths = asyncio.Queue()
+        _ = [self.paths.put_nowait(path) for path in paths]
+
         self.base_url = base_url
         self.local_dir = local_dir
         self.NUMBER_OF_STREAMS = 3
@@ -33,10 +34,11 @@ class Downloader(object):
         """
         url = '/'.join([self.base_url, 'src', 'branch', 'master', path])
         filename = path.split('/')[-1]
-        response = requests.get(url, timeout=5)
 
-        with open('/'.join([self.local_dir, filename]), 'wb') as rf:
-            rf.write(response.content)
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            with open('/'.join([self.local_dir, filename]), 'wb') as rf:
+                rf.write(response.content)
 
     async def run(self):
         """
@@ -54,6 +56,6 @@ class Downloader(object):
 
     async def _download_files(self):
         """Download files from the paths list."""
-        while self.paths:
-            path = quote(self.paths.pop())
+        while not self.paths.empty():
+            path = quote(await self.paths.get())
             await self.download_file(path)
